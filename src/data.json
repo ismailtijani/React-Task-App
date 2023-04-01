@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "title": "Finish the essay collaboration",
+    "dueDtate": null,
+    "completed": false,
+    "subTodos": [
+      {
+        "id": 1,
+        "title": "Peruse through again",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Buy groceries",
+    "dueDtate": null,
+    "completed": false,
+    "subTodos": [
+      {
+        "id": 1,
+        "title": "Get milk",
+        "completed": false
+      },
+      {
+        "id": 2,
+        "title": "Get bread",
+        "completed": false
+      },
+      {
+        "id": 3,
+        "title": "Get eggs",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Do something great",
+    "dueDtate": null,
+    "completed": true,
+    "subTodos": []
+  }
+]

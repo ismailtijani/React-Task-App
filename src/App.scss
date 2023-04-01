@@ -34,6 +34,8 @@
 
         .add-icon {
           color: red;
+          cursor: pointer;
+          font-size: 2rem;
         }
 
         input {
@@ -63,15 +65,55 @@
           border-radius: 8px;
           padding: 10px;
 
+          .todo-icons {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+          }
+
+          .todo-icons-inner {
+            opacity: 0;
+            cursor: pointer;
+          }
+
+          .arrow {
+            cursor: pointer;
+            font-size: 1.5rem;
+          }
+
+          &:hover {
+            .todo-icons-inner {
+              opacity: 1;
+            }
+          }
+
+          .edit-button {
+            padding: 8px;
+            cursor: pointer;
+            background: red;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            font-weight: bold;
+            color: white;
+          }
           .left {
             display: flex;
             align-items: start;
+
+            .edit-todo-input {
+              background: transparent;
+              border-radius: 8px;
+              width: 100%;
+              padding: 10px;
+            }
 
             > span {
               margin-right: 8px;
 
               .circle-icon {
                 color: red;
+                font-size: 1.5rem;
               }
             }
 
@@ -81,7 +123,135 @@
             }
           }
         }
+
+        .sub-todo {
+          margin: 20px 0 20px 20px;
+          display: flex;
+          justify-content: space-between;
+          border: 0.5px solid white;
+          border-radius: 8px;
+          padding: 10px;
+
+          .sub-todo-content {
+            display: flex;
+
+            span {
+              margin-right: 10px;
+            }
+          }
+        }
+
+        .none {
+          display: none;
+        }
+      }
+    }
+
+    .completed-tasks {
+      .completed-task {
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        border: 0.5px solid white;
+        border-radius: 8px;
+        padding: 10px;
+
+        span {
+          margin-right: 10px;
+        }
+
+        h4 {
+          text-decoration: line-through;
+        }
       }
     }
   }
 }
+
+// // @import "./sass/variables";
+
+// * {
+//   box-sizing: border-box;
+//   margin: 0;
+//   padding: 0;
+// }
+
+// .app {
+//   width: 100%;
+//   height: 100vh;
+//   background: lightgray;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+
+//   .task-container {
+//     width: 500px;
+
+//     .task-container-header {
+//       background: transparent;
+//       margin-bottom: 20px;
+
+//       .task-container-heading {
+//         border: 0.5px solid white;
+//         border-radius: 8px;
+//         padding: 10px;
+//         display: flex;
+//         align-items: center;
+
+//         span {
+//           margin-right: 10px;
+//         }
+
+//         .add-icon {
+//           color: red;
+//         }
+
+//         input {
+//           background: transparent;
+//           outline: none;
+//           border: none;
+//           width: 100%;
+//           // color: white;
+
+//           // &focus {
+//           //   outline: none;
+//           //   border: none;
+//           // }
+//         }
+//       }
+//     }
+
+//     .all-tasks {
+//       .tasks {
+//         display: block;
+
+//         .task {
+//           margin: 20px 0;
+//           display: flex;
+//           justify-content: space-between;
+//           border: 0.5px solid white;
+//           border-radius: 8px;
+//           padding: 10px;
+
+//           .left {
+//             display: flex;
+//             align-items: start;
+
+//             > span {
+//               margin-right: 8px;
+
+//               .circle-icon {
+//                 color: red;
+//               }
+//             }
+
+//             h4 {
+//               margin: 0;
+//               padding: 0;
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
