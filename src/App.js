@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import "./App.scss";
-import { BsPlusCircleFill, BsCircle } from "react-icons/bs";
-import {
-  MdOutlineCalendarToday,
-  MdDelete,
-  MdEdit,
-  MdAdd,
-} from "react-icons/md";
-import { BiChevronDown, BiChevronUp } from "react-icons/bi";
-import { AiFillCheckCircle } from "react-icons/ai";
 import data from "./data.json";
+import CompletedTodos from "./components/completed-todos";
+import TodoInput from "./components/todo-input";
+import Todo from "./components/todo";
+import SubTodoList from "./components/sub-todo-list";
+import { BsPlusCircleFill } from "react-icons/bs";
+// import writeFileP from "write-file-p";
 
 function App() {
   const [todos, setTodos] = useState(data);
@@ -17,19 +14,26 @@ function App() {
   const [edit, setEdit] = useState(false);
   const [showSubtodo, setShowSubtodo] = useState(false);
   const [completedTodos, setCompletedTodos] = useState([]);
+  const [unCompletedTodos, setUnCompletedTodos] = useState([]);
+  const [subTask, setSubTask] = useState("");
+  const [subTaskInput, setSubTaskInput] = useState(false);
 
   useEffect(() => {
     const completedTodo = todos.filter((todo) => todo.completed === true);
     setCompletedTodos(completedTodo);
-  }, [todos]);
 
-  // console.log(sCompletedTodos);
+    const unCompletedTodo = todos.filter((todo) => todo.completed === false);
+    setUnCompletedTodos(unCompletedTodo);
+
+    // handleSaveToPC(todos)
+    // writeFileP.sync(`${__dirname}/data.json`, todos);
+  }, [todos]);
 
   const addTodo = (e) => {
     e.preventDefault();
 
     if (title === "") {
-      alert("Add a todo");
+      alert("Empty input, pls add a todo/task");
       return;
     }
 
@@ -41,11 +45,64 @@ function App() {
     };
 
     setTodos([...todos, newTodo]);
+    setTitle("");
+  };
+
+  const addSubTodo = (subTask, id) => {
+    if (subTask === "") {
+      alert("Empty input, pls add a sub todo/task");
+      return;
+    }
+
+    const newTodo = [...todos];
+
+    const len = newTodo[id - 1].subTodos.length;
+
+    const newSubTodo = {
+      id: len + 1,
+      title: subTask,
+      completed: false,
+    };
+
+    newTodo[id - 1].subTodos.push(newSubTodo);
+    setTodos(newTodo);
+    setSubTask("");
+    setSubTaskInput(false);
+  };
+
+  const setDueDate = (id, date) => {
+    const updatedTodoList = [...todos];
+    updatedTodoList[id - 1].dueDate = date;
+    setTodos(updatedTodoList);
   };
 
   const markTodoAsComplete = (id) => {
     const newTodo = [...todos];
-    newTodo[id - 1].completed = true;
+
+    if (newTodo[id - 1].subTodos.length === 0) {
+      newTodo[id - 1].completed = true;
+      setTodos(newTodo);
+    } else {
+      const completedSubTodos = newTodo[id - 1].subTodos.every(
+        (subTodo) => subTodo.completed
+      );
+
+      if (completedSubTodos) {
+        newTodo[id - 1].completed = true;
+        setTodos(newTodo);
+      } else {
+        alert("Complete your sub tasks");
+      }
+    }
+  };
+
+  const markSubTodoAsComplete = (todoId, subTodoId) => {
+    const newTodo = [...todos];
+
+    const subTodos = newTodo[todoId - 1].subTodos;
+
+    subTodos[subTodoId - 1].completed = true;
+    newTodo[todoId - 1].subTodos = subTodos;
     setTodos(newTodo);
   };
 
@@ -67,161 +124,96 @@ function App() {
     setTodos(newTodos);
   };
 
+  const handleSaveToPC = (jsonData) => {
+    const fileData = JSON.stringify(jsonData);
+    const blob = new Blob([fileData], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = "data.json";
+    link.href = url;
+    link.click();
+  };
+
   return (
     <div className="app">
       <div className="task-container">
         <div className="task-container-header">
-          <div className="task-container-heading">
-            <span onClick={addTodo}>
-              <BsPlusCircleFill className="add-icon" />
-            </span>
-            <input
-              type="text"
-              placeholder="Add a task"
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
+          <TodoInput addTodo={addTodo} title={title} setTitle={setTitle} />
         </div>
+
         <div className="all-tasks">
-          <h3>Task - {todos.length}</h3>
+          <h3>Task - {unCompletedTodos.length}</h3>
 
           <div className="tasks">
-            {todos.map((todo) => (
+            {unCompletedTodos.map((todo, index) => (
               <div key={todo.id}>
-                <div className="task">
-                  <div className="left">
-                    <span onClick={() => markTodoAsComplete(todo.id)}>
-                      {todo.completed ? (
-                        <AiFillCheckCircle className="circle-icon" />
-                      ) : (
-                        <BsCircle className="circle-icon" />
-                      )}
-                    </span>
+                <Todo
+                  todo={todo}
+                  title={title}
+                  setTitle={setTitle}
+                  edit={edit}
+                  showSubtodo={showSubtodo}
+                  setShowSubtodo={setShowSubtodo}
+                  removeTodo={removeTodo}
+                  markTodoAsComplete={markTodoAsComplete}
+                  updateTodo={updateTodo}
+                  handleEditChange={handleEditChange}
+                  subTaskInput={subTaskInput}
+                  setSubTaskInput={setSubTaskInput}
+                  setDueDate={setDueDate}
+                />
 
-                    {/* <span>
-                      <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => markTodoAsComplete(todo.id)}
-                      />
-                    </span> */}
-                    <div className="task-text">
-                      {edit === todo.id ? (
-                        <input
-                          type="text"
-                          className="edit-todo-input"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                        />
-                      ) : (
-                        <h4>{todo.title}</h4>
-                      )}
-                      {edit === todo.id ? (
-                        ""
-                      ) : (
-                        <div>
-                          <span>0/1</span> &nbsp;&nbsp;
-                          <span>
-                            <MdOutlineCalendarToday /> Today
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {edit === todo.id ? (
+                {subTaskInput === todo.id && (
+                  <div className="add-sub-task">
+                    <span onClick={addTodo}>
+                      <BsPlusCircleFill className="add-icon" />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Add sub-task"
+                      onChange={(e) => setSubTask(e.target.value)}
+                      value={subTask}
+                    />
                     <button
                       className="edit-button"
-                      onClick={() => updateTodo(todo.id, title)}
+                      onClick={() => addSubTodo(subTask, todo.id)}
                     >
-                      Edit todo
+                      Add Sub Todo
                     </button>
-                  ) : (
-                    <div className="todo-icons">
-                      <div className="todo-icons-inner">
-                        <span onClick={() => removeTodo(todo.id)}>
-                          <MdAdd />
-                        </span>
-                        <span
-                          onClick={() => handleEditChange(todo.id, todo.title)}
-                        >
-                          <MdEdit />
-                        </span>
-                        <span onClick={() => removeTodo(todo.id)}>
-                          <MdDelete />
-                        </span>
-                      </div>
-                      <span
-                        className="arrow"
-                        onClick={() => {
-                          if (todo.subTodos.length === 0) {
-                            alert("Add a todo");
-                            return;
-                          }
+                  </div>
+                )}
 
-                          setShowSubtodo(!showSubtodo);
-                        }}
-                      >
-                        {showSubtodo ? <BiChevronUp /> : <BiChevronDown />}
-                      </span>
-                    </div>
-                  )}
-                </div>
                 {todo.subTodos &&
                   todo.subTodos.map((subTodo) => (
-                    <div
+                    <SubTodoList
                       key={subTodo.id}
-                      className={showSubtodo ? "sub-todo" : "none"}
-                    >
-                      <div className="sub-todo-content">
-                        <span>
-                          {todo.completed ? (
-                            <AiFillCheckCircle className="circle-icon" />
-                          ) : (
-                            <BsCircle className="circle-icon" />
-                          )}
-                        </span>
-                        {/* <span>
-                          <input
-                            type="checkbox"
-                            checked={subTodo.completed}
-                            onChange={() => markTodoAsComplete(subTodo.id)}
-                          />
-                        </span> */}
-                        <div className="task-text">
-                          <h4>{subTodo.title}</h4>
-                        </div>
-                      </div>
-                    </div>
+                      todo={todo}
+                      subTodo={subTodo}
+                      showSubtodo={showSubtodo}
+                      markSubTodoAsComplete={markSubTodoAsComplete}
+                    />
                   ))}
               </div>
             ))}
           </div>
         </div>
 
-        {completedTodos.length !== 0 && (
-          <div className="completed-tasks">
-            <h3>Completed - {completedTodos.length}</h3>
+        {/* <TodoList
+          todos={unCompletedTodos}
+          title={title}
+          setTitle={setTitle}
+          edit={edit}
+          showSubtodo={showSubtodo}
+          setShowSubtodo={setShowSubtodo}
+          removeTodo={removeTodo}
+          markTodoAsComplete={markTodoAsComplete}
+          updateTodo={updateTodo}
+          handleEditChange={handleEditChange}
+          markSubTodoAsComplete={markSubTodoAsComplete}
+        /> */}
 
-            {completedTodos.map((todo) => (
-              <div key={todo.id} className="completed-task">
-                <span onClick={() => markTodoAsComplete(todo.id)}>
-                  {todo.completed ? (
-                    <AiFillCheckCircle className="circle-icon" />
-                  ) : (
-                    <BsCircle className="circle-icon" />
-                  )}
-                </span>
-                {/* <span>
-                  <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => markTodoAsComplete(todo.id)}
-                  />
-                </span> */}
-                <h4>{todo.title}</h4>
-              </div>
-            ))}
-          </div>
+        {completedTodos.length !== 0 && (
+          <CompletedTodos completedTodos={completedTodos} />
         )}
       </div>
     </div>
