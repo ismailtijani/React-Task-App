@@ -25,7 +25,7 @@
     },
     {
       "id": "74d010c2-7797-4e54-b728-39ad8286090c",
-      "title": "Continue React Course",
+      "title": "Continue My React Course",
       "completed": false,
       "subTodos": [
         {
@@ -57,19 +57,26 @@
     {
       "id": "a2c140fc-fe87-41b7-b85d-4d78396f28eb",
       "title": "Submit Task",
-      "completed": false,
+      "completed": true,
       "subTodos": [
         {
           "id": "7548dfaa-e3db-4ae1-b5ac-9a06a1adcd98",
           "title": "Chat Mr Imo Inyang",
-          "completed": false
+          "completed": true
         },
         {
           "id": "51695a00-c3c6-4a55-871b-ce2513ea8268",
           "title": "Review my Resume",
-          "completed": false
+          "completed": true
         }
       ],
+      "dueDate": "2023-04-02"
+    },
+    {
+      "id": "21554bb1-a7d8-4687-b32b-14ba6a4456bd",
+      "title": "Call Rahmat",
+      "completed": false,
+      "subTodos": [],
       "dueDate": "2023-04-02"
     }
   ]

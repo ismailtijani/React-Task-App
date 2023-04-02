@@ -6,6 +6,7 @@ import Todo from "./components/todo";
 import SubTodoList from "./components/sub-todo-list";
 import { BsPlusCircleFill } from "react-icons/bs";
 import { v4 as uuidv4 } from "uuid";
+import baseUrl from "./constant";
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -18,7 +19,7 @@ function App() {
   const [subTaskInput, setSubTaskInput] = useState(false);
 
   const getTodos = async () => {
-    const res = await fetch("http://localhost:3000/todos");
+    const res = await fetch(baseUrl);
     const data = await res.json();
     setTodos(data);
   };
@@ -50,7 +51,7 @@ function App() {
       subTodos: [],
     };
 
-    fetch("http://localhost:3000/todos", {
+    fetch(baseUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +81,7 @@ function App() {
 
     const subTodos = [...subTodo, newSubTodo];
 
-    await fetch(`http://localhost:3000/todos/${id}`, {
+    await fetch(`${baseUrl}/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +95,7 @@ function App() {
   };
 
   const setDueDate = async (id, date) => {
-    await fetch(`http://localhost:3000/todos/${id}`, {
+    await fetch(`${baseUrl}/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +107,7 @@ function App() {
   };
 
   const update = async (id) =>
-    await fetch(`http://localhost:3000/todos/${id}`, {
+    await fetch(`${baseUrl}/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -148,7 +149,7 @@ function App() {
 
     console.log("new todos", newTodo);
 
-    await fetch(`http://localhost:3000/todos/${todoId}`, {
+    await fetch(`${baseUrl}/${todoId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -160,7 +161,7 @@ function App() {
   };
 
   const updateTodo = async (id, text) => {
-    await fetch(`http://localhost:3000/todos/${id}`, {
+    await fetch(`${baseUrl}/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -181,7 +182,7 @@ function App() {
   };
 
   const removeTodo = async (id) => {
-    await fetch(`http://localhost:3000/todos/${id}`, {
+    await fetch(`${baseUrl}/${id}`, {
       method: "DELETE",
     }).then(() => getTodos());
   };
