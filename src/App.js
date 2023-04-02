@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import "./App.scss";
-import data from "./data.json";
 import CompletedTodos from "./components/completed-todos";
 import TodoInput from "./components/todo-input";
 import Todo from "./components/todo";
 import SubTodoList from "./components/sub-todo-list";
 import { BsPlusCircleFill } from "react-icons/bs";
-// import writeFileP from "write-file-p";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
-  const [todos, setTodos] = useState(data);
+  const [todos, setTodos] = useState([]);
   const [title, setTitle] = useState("");
   const [edit, setEdit] = useState(false);
   const [showSubtodo, setShowSubtodo] = useState(false);
@@ -18,15 +17,22 @@ function App() {
   const [subTask, setSubTask] = useState("");
   const [subTaskInput, setSubTaskInput] = useState(false);
 
+  const getTodos = async () => {
+    const res = await fetch("http://localhost:3000/todos");
+    const data = await res.json();
+    setTodos(data);
+  };
+
+  useEffect(() => {
+    getTodos();
+  }, []);
+
   useEffect(() => {
     const completedTodo = todos.filter((todo) => todo.completed === true);
     setCompletedTodos(completedTodo);
 
     const unCompletedTodo = todos.filter((todo) => todo.completed === false);
     setUnCompletedTodos(unCompletedTodo);
-
-    // handleSaveToPC(todos)
-    // writeFileP.sync(`${__dirname}/data.json`, todos);
   }, [todos]);
 
   const addTodo = (e) => {
@@ -38,17 +44,25 @@ function App() {
     }
 
     const newTodo = {
-      id: todos.length + 1,
+      id: uuidv4(),
       title,
       completed: false,
       subTodos: [],
     };
 
-    setTodos([...todos, newTodo]);
-    setTitle("");
+    fetch("http://localhost:3000/todos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newTodo),
+    }).then(() => {
+      setTodos([...todos, newTodo]);
+      setTitle("");
+    });
   };
 
-  const addSubTodo = (subTask, id) => {
+  const addSubTodo = async (subTask, id) => {
     if (subTask === "") {
       alert("Empty input, pls add a sub todo/task");
       return;
@@ -56,61 +70,109 @@ function App() {
 
     const newTodo = [...todos];
 
-    const len = newTodo[id - 1].subTodos.length;
+    const subTodo = newTodo.find((t) => t.id === id).subTodos;
 
     const newSubTodo = {
-      id: len + 1,
+      id: uuidv4(),
       title: subTask,
       completed: false,
     };
 
-    newTodo[id - 1].subTodos.push(newSubTodo);
-    setTodos(newTodo);
-    setSubTask("");
-    setSubTaskInput(false);
+    const subTodos = [...subTodo, newSubTodo];
+
+    await fetch(`http://localhost:3000/todos/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ subTodos }),
+    }).then(() => {
+      getTodos();
+      setSubTask("");
+      setSubTaskInput(false);
+    });
   };
 
-  const setDueDate = (id, date) => {
-    const updatedTodoList = [...todos];
-    updatedTodoList[id - 1].dueDate = date;
-    setTodos(updatedTodoList);
+  const setDueDate = async (id, date) => {
+    await fetch(`http://localhost:3000/todos/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dueDate: date,
+      }),
+    }).then(() => getTodos());
   };
 
-  const markTodoAsComplete = (id) => {
+  const update = async (id) =>
+    await fetch(`http://localhost:3000/todos/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        completed: true,
+      }),
+    }).then(() => getTodos());
+
+  const markTodoAsComplete = async (id) => {
     const newTodo = [...todos];
 
-    if (newTodo[id - 1].subTodos.length === 0) {
-      newTodo[id - 1].completed = true;
-      setTodos(newTodo);
-    } else {
-      const completedSubTodos = newTodo[id - 1].subTodos.every(
-        (subTodo) => subTodo.completed
-      );
+    const subTodo = newTodo.find((t) => t.id === id);
 
+    const completedSubTodos = subTodo.subTodos.every(
+      (subTodo) => subTodo.completed
+    );
+
+    if (subTodo.subTodos.length === 0) {
+      update(id);
+      return;
+    } else if (subTodo.subTodos.length > 0) {
       if (completedSubTodos) {
-        newTodo[id - 1].completed = true;
-        setTodos(newTodo);
+        update(id);
       } else {
-        alert("Complete your sub tasks");
+        alert("Complete all sub task");
+        return;
       }
     }
   };
 
-  const markSubTodoAsComplete = (todoId, subTodoId) => {
+  const markSubTodoAsComplete = async (todoId, todoIndex, subTodoIndex) => {
     const newTodo = [...todos];
 
-    const subTodos = newTodo[todoId - 1].subTodos;
+    let subTodos = newTodo.find((t) => t.id === todoId).subTodos;
 
-    subTodos[subTodoId - 1].completed = true;
-    newTodo[todoId - 1].subTodos = subTodos;
-    setTodos(newTodo);
+    subTodos[subTodoIndex].completed = true;
+    newTodo[todoIndex].subTodos = subTodos;
+
+    console.log("new todos", newTodo);
+
+    await fetch(`http://localhost:3000/todos/${todoId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        subTodos,
+      }),
+    }).then(() => getTodos());
   };
 
-  const updateTodo = (id, text) => {
-    const newTodos = [...todos];
-    newTodos[id - 1].title = text;
-    setTodos(newTodos);
-    setEdit(false);
+  const updateTodo = async (id, text) => {
+    await fetch(`http://localhost:3000/todos/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: text,
+      }),
+    }).then(() => {
+      getTodos();
+      setTitle("");
+      setEdit(false);
+    });
   };
 
   const handleEditChange = (id, text) => {
@@ -118,20 +180,10 @@ function App() {
     setTitle(text);
   };
 
-  const removeTodo = (id) => {
-    const newTodos = [...todos];
-    newTodos.splice(id - 1, 1);
-    setTodos(newTodos);
-  };
-
-  const handleSaveToPC = (jsonData) => {
-    const fileData = JSON.stringify(jsonData);
-    const blob = new Blob([fileData], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.download = "data.json";
-    link.href = url;
-    link.click();
+  const removeTodo = async (id) => {
+    await fetch(`http://localhost:3000/todos/${id}`, {
+      method: "DELETE",
+    }).then(() => getTodos());
   };
 
   return (
@@ -152,6 +204,7 @@ function App() {
                   title={title}
                   setTitle={setTitle}
                   edit={edit}
+                  setEdit={setEdit}
                   showSubtodo={showSubtodo}
                   setShowSubtodo={setShowSubtodo}
                   removeTodo={removeTodo}
@@ -165,30 +218,43 @@ function App() {
 
                 {subTaskInput === todo.id && (
                   <div className="add-sub-task">
-                    <span onClick={addTodo}>
-                      <BsPlusCircleFill className="add-icon" />
-                    </span>
-                    <input
-                      type="text"
-                      placeholder="Add sub-task"
-                      onChange={(e) => setSubTask(e.target.value)}
-                      value={subTask}
-                    />
-                    <button
-                      className="edit-button"
-                      onClick={() => addSubTodo(subTask, todo.id)}
-                    >
-                      Add Sub Todo
-                    </button>
+                    <div className="add-sub-task-inner">
+                      <span onClick={addTodo}>
+                        <BsPlusCircleFill className="add-icon" />
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Add sub-task"
+                        onChange={(e) => setSubTask(e.target.value)}
+                        value={subTask}
+                      />
+                    </div>
+
+                    <div className="add-sub-task-inner">
+                      <button
+                        className="edit-button"
+                        onClick={() => addSubTodo(subTask, todo.id, index)}
+                      >
+                        Add Sub Todo
+                      </button>
+                      <button
+                        className="edit-button"
+                        onClick={() => setSubTaskInput(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 )}
 
                 {todo.subTodos &&
-                  todo.subTodos.map((subTodo) => (
+                  todo.subTodos.map((subTodo, subTodoIndex) => (
                     <SubTodoList
                       key={subTodo.id}
                       todo={todo}
                       subTodo={subTodo}
+                      todoIndex={index}
+                      subTodoIndex={subTodoIndex}
                       showSubtodo={showSubtodo}
                       markSubTodoAsComplete={markSubTodoAsComplete}
                     />
@@ -198,22 +264,11 @@ function App() {
           </div>
         </div>
 
-        {/* <TodoList
-          todos={unCompletedTodos}
-          title={title}
-          setTitle={setTitle}
-          edit={edit}
-          showSubtodo={showSubtodo}
-          setShowSubtodo={setShowSubtodo}
-          removeTodo={removeTodo}
-          markTodoAsComplete={markTodoAsComplete}
-          updateTodo={updateTodo}
-          handleEditChange={handleEditChange}
-          markSubTodoAsComplete={markSubTodoAsComplete}
-        /> */}
-
         {completedTodos.length !== 0 && (
-          <CompletedTodos completedTodos={completedTodos} />
+          <CompletedTodos
+            completedTodos={completedTodos}
+            removeTodo={removeTodo}
+          />
         )}
       </div>
     </div>

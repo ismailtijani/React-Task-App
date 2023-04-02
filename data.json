@@ -1,0 +1,76 @@
+{
+  "todos": [
+    {
+      "id": "b37931f8-2fda-4322-8962-54df1c948d56",
+      "title": "Sleep Well",
+      "completed": false,
+      "subTodos": [
+        {
+          "id": "1faad239-62fb-4a35-ae9c-a5c403231270",
+          "title": "Take a Nap",
+          "completed": false
+        },
+        {
+          "id": "42333b77-5d6e-4a64-a62e-a48aa72d9b51",
+          "title": "Make my bed",
+          "completed": false
+        },
+        {
+          "id": "0a84f847-8423-4068-a3d6-d20179fb7fb8",
+          "title": "Take a shower",
+          "completed": false
+        }
+      ],
+      "dueDate": "2023-04-13"
+    },
+    {
+      "id": "74d010c2-7797-4e54-b728-39ad8286090c",
+      "title": "Continue React Course",
+      "completed": false,
+      "subTodos": [
+        {
+          "id": "ae4d4e9d-48f0-403d-a963-504cd52edd9c",
+          "title": "Complete the last project i am working on",
+          "completed": false
+        },
+        {
+          "id": "7eb6c344-5671-4f1f-8d2a-820a3c55816f",
+          "title": "Study 2 modules more",
+          "completed": false
+        }
+      ],
+      "dueDate": "2023-04-03"
+    },
+    {
+      "id": "c132bb14-9f37-483d-ac6d-f8de43df0b81",
+      "title": "Visit my Sis",
+      "completed": true,
+      "subTodos": [
+        {
+          "id": "75250aaa-f834-4d42-b254-5a3b8c7605c3",
+          "title": "Along the way visit Jumoke",
+          "completed": true
+        }
+      ],
+      "dueDate": "2023-04-02"
+    },
+    {
+      "id": "a2c140fc-fe87-41b7-b85d-4d78396f28eb",
+      "title": "Submit Task",
+      "completed": false,
+      "subTodos": [
+        {
+          "id": "7548dfaa-e3db-4ae1-b5ac-9a06a1adcd98",
+          "title": "Chat Mr Imo Inyang",
+          "completed": false
+        },
+        {
+          "id": "51695a00-c3c6-4a55-871b-ce2513ea8268",
+          "title": "Review my Resume",
+          "completed": false
+        }
+      ],
+      "dueDate": "2023-04-02"
+    }
+  ]
+}

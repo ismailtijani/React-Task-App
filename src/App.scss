@@ -1,4 +1,5 @@
-// @import "./sass/variables";
+@import "./sass/_variable";
+@import "./sass/mixin";
 
 * {
   box-sizing: border-box;
@@ -8,27 +9,23 @@
 
 .app {
   width: 100%;
-  height: 100vh;
-  background: #181720;
-  opacity: 8;
-  display: flex;
+  min-height: 100vh;
+  height: 100%;
+  padding: 20px;
+  background: $app-bg-color;
+  @include display;
   justify-content: center;
-  align-items: center;
+  overflow: scroll;
+  scroll-behavior: smooth;
 
   input[type="date"]::before {
-    color: #999999;
     content: attr(placeholder);
   }
 
   input[type="date"] {
-    color: #ffffff;
+    color: $button-color;
     width: 20px;
-    background: #717177;
-  }
-
-  input[type="date"]:focus,
-  input[type="date"]:valid {
-    color: #666666;
+    background: $input-date-bg;
   }
 
   input[type="date"]:focus::before,
@@ -39,9 +36,31 @@
   .task-container {
     width: 500px;
     font-family: sans-serif;
+    height: 100%;
 
     h3 {
-      color: #b4b4b6;
+      color: $text-color;
+    }
+
+    button {
+      padding: 8px;
+      cursor: pointer;
+      background: $button-icon-bg;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      font-weight: bold;
+      color: $button-color;
+      margin: 0 5px;
+    }
+
+    input[type="text"] {
+      background: transparent;
+      outline: none;
+      border: none;
+      width: 100%;
+      color: $text-color;
+      font-size: 1rem;
     }
 
     @media (max-width: 600px) {
@@ -54,36 +73,28 @@
       margin-bottom: 20px;
 
       .task-container-heading {
-        border: 0.1px solid #b4b4b6;
+        border: 0.1px solid $text-color;
         background: transparent;
         opacity: 7;
         border-radius: 8px;
         padding: 10px;
-        display: flex;
-        align-items: center;
+        @include display;
 
         span {
           margin-right: 10px;
         }
 
         .add-icon {
-          color: #e36d93;
+          color: $button-icon-bg;
           cursor: pointer;
           font-size: 2rem;
-        }
-
-        input {
-          background: transparent;
-          outline: none;
-          border: none;
-          width: 100%;
-          color: #b4b4b6;
-          font-size: 1rem;
         }
       }
     }
 
     .all-tasks {
+      margin-bottom: 30px;
+
       .tasks {
         display: block;
 
@@ -91,87 +102,60 @@
           margin: 20px 0;
           display: flex;
           justify-content: space-between;
-          background: #21212b;
+          align-items: flex-start;
+          background: $todo-bg-color;
           border-radius: 8px;
           padding: 10px;
-          color: #b4b4b6;
+          color: $text-color;
 
-          .down {
-            display: flex;
-            align-items: center;
+          .sub-task-count {
+            margin-right: 10px;
+            @include display;
+          }
 
-            .sub-task-count {
-              margin-right: 10px;
-              display: flex;
-              align-items: center;
-            }
-
-            .due-date {
-              display: flex;
-              align-items: center;
-
-              input {
-                margin-right: 10px;
-              }
-            }
+          input {
+            margin-right: 10px;
           }
 
           .todo-icons {
-            display: flex;
-            align-items: center;
+            @include display;
             font-size: 1.2rem;
           }
 
           .todo-icons-inner {
             opacity: 0;
-            cursor: pointer;
 
             span {
-              color: #89898e;
+              color: $todo-hover-icons-color;
             }
           }
 
           .arrow {
-            cursor: pointer;
             font-size: 1.5rem;
           }
 
           &:hover {
+            cursor: pointer;
+
             .todo-icons-inner {
               opacity: 1;
             }
           }
 
-          .edit-button {
-            padding: 8px;
-            cursor: pointer;
-            background: #e36d93;
-            border: none;
-            border-radius: 5px;
-            outline: none;
-            font-weight: bold;
-            color: white;
+          .edit-todo-input {
+            background: transparent;
+            border-radius: 8px;
+            width: 100%;
+            padding: 10px;
           }
 
-          .left {
-            display: flex;
-            align-items: start;
+          span {
+            margin-right: 8px;
+          }
 
-            .edit-todo-input {
-              background: transparent;
-              border-radius: 8px;
-              width: 100%;
-              padding: 10px;
-            }
-
-            > span {
-              margin-right: 8px;
-            }
-
-            h4 {
-              margin: 0;
-              padding: 0;
-            }
+          h4 {
+            margin: 0;
+            padding: 0;
           }
         }
 
@@ -179,24 +163,30 @@
           border: 0.5px solid white;
           border-radius: 8px;
           padding: 10px;
-          display: flex;
-          align-items: center;
+          @include display-between;
+
+          span {
+            margin-right: 10px;
+          }
+
+          .add-icon {
+            color: $button-icon-bg;
+            cursor: pointer;
+            font-size: 2rem;
+
+          }
         }
 
         .sub-todo {
           margin: 20px 0 20px 20px;
-          display: flex;
-          justify-content: space-between;
-          background: #21212b;
+          @include display-between;
+          background: $todo-bg-color;
           border-radius: 8px;
           padding: 10px;
+          color: $text-color;
 
-          .sub-todo-content {
-            display: flex;
-
-            span {
-              margin-right: 10px;
-            }
+          span {
+            margin-right: 10px;
           }
         }
 
@@ -207,28 +197,44 @@
     }
 
     .circle-icon {
-      color: #e36d93;
+      color: $button-icon-bg;
       font-size: 1.5rem;
+      cursor: pointer;
     }
 
     .completed-tasks {
       .completed-task {
         margin: 20px 0;
-        display: flex;
-        align-items: center;
-        background: #21212b;
+        @include display-between;
+        background: $todo-bg-color;
         border-radius: 8px;
         padding: 10px;
-        color: #b4b4b6;
+        color: $text-color;
 
         span {
           margin-right: 10px;
+        }
+
+        p {
+          font-size: 14px;
         }
 
         h4 {
           text-decoration: line-through;
         }
       }
+    }
+
+    .left,
+    .completed-task-inner {
+      display: flex;
+    }
+
+    .add-sub-task-inner,
+    .sub-todo-content,
+    .down,
+    .due-date {
+      @include display;
     }
   }
 }

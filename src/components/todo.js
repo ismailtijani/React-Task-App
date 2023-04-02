@@ -2,38 +2,24 @@ import { BsCircle } from "react-icons/bs";
 import { MdDelete, MdEdit, MdAdd, MdOutlineCountertops } from "react-icons/md";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import moment from "moment";
+import { getRelativeDate } from "../utils/helper.utils";
 
 const Todo = ({
   todo,
   title,
   setTitle,
   edit,
+  setEdit,
   showSubtodo,
   setShowSubtodo,
   removeTodo,
   markTodoAsComplete,
   updateTodo,
   handleEditChange,
+  subTaskInput,
   setSubTaskInput,
   setDueDate,
 }) => {
-  const getRelativeDate = (dateString) => {
-    const date = moment(dateString, "YYYY-MM-DD");
-    const today = moment().startOf("day");
-    const diff = date.diff(today, "days");
-
-    switch (diff) {
-      case 0:
-        return "today";
-      case 1:
-        return "tomorrow";
-      case -1:
-        return "yesterday";
-      default:
-        return date.format("dddd");
-    }
-  };
-
   return (
     <div className="task">
       <div className="left">
@@ -58,7 +44,9 @@ const Todo = ({
               {todo.subTodos.length === 0 ? null : (
                 <span className="sub-task-count">
                   <MdOutlineCountertops />
-                  &nbsp; 0/{todo.subTodos.length}
+                  &nbsp;
+                  {todo.subTodos.filter((t) => t.completed).length}/
+                  {todo.subTodos.length}
                 </span>
               )}
               <span className="due-date">
@@ -83,30 +71,32 @@ const Todo = ({
         </div>
       </div>
       {edit === todo.id ? (
-        <button
-          className="edit-button"
-          onClick={() => updateTodo(todo.id, title)}
-        >
-          Edit todo
-        </button>
+        <div>
+          <button onClick={() => updateTodo(todo.id, title)}>Edit todo</button>
+          <button
+            onClick={() => {
+              setEdit(false);
+              setTitle("");
+            }}
+          >
+            Cancel Edit
+          </button>
+        </div>
       ) : (
         <div className="todo-icons">
-          <div className="todo-icons-inner">
-            {!todo.completed && (
-              <>
-                <span onClick={() => setSubTaskInput(todo.id)}>
-                  <MdAdd />
-                </span>
-                <span onClick={() => handleEditChange(todo.id, todo.title)}>
-                  <MdEdit />
-                </span>
-              </>
-            )}
-
-            <span onClick={() => removeTodo(todo.id)}>
-              <MdDelete />
-            </span>
-          </div>
+          {!subTaskInput && (
+            <div className="todo-icons-inner">
+              <span onClick={() => setSubTaskInput(todo.id)}>
+                <MdAdd />
+              </span>
+              <span onClick={() => handleEditChange(todo.id, todo.title)}>
+                <MdEdit />
+              </span>
+              <span onClick={() => removeTodo(todo.id)}>
+                <MdDelete />
+              </span>
+            </div>
+          )}
           {showSubtodo === todo.id ? (
             <span className="arrow" onClick={() => setShowSubtodo(false)}>
               <BiChevronUp />
